@@ -21,8 +21,8 @@ public class AppTest {
 
     // Test data - should be moved to a configuration file in a real project
     private static final String PERIPLUS_URL = "https://www.periplus.com/";
-    private static final String TEST_EMAIL = "hungrybuidler@gmail.com";  // Replace with your actual test account
-    private static final String TEST_PASSWORD = "dev12345";  // Replace with your actual password
+    private static final String TEST_EMAIL = System.getProperty("test.email", System.getenv("TEST_EMAIL"));  // Replace with your actual test account
+    private static final String TEST_PASSWORD = System.getProperty("test.password", System.getenv("TEST_PASSWORD"));  // Replace with your actual password
     private static final String SEARCH_TERM = "Blockchains";
 
     @BeforeClass
