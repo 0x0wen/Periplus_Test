@@ -3,7 +3,7 @@
 <suite name="Periplus Shopping Cart Test Suite">
     <test name="Shopping Cart Tests">
         <classes>
-            <class name="com.openway.tests.AppTest"/>
+            <class name="com.openway.tests.ShoppingCartTest"/>
         </classes>
     </test>
 </suite>
