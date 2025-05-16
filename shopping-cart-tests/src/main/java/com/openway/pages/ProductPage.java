@@ -7,6 +7,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class ProductPage extends BasePage {
+    private PageLayout pageLayout = new PageLayout(driver);
 
     @FindBy(tagName = "h2")
     private WebElement productTitle;
@@ -22,9 +23,6 @@ public class ProductPage extends BasePage {
 
     @FindBy(xpath = "//button[contains(@class,'btn-product-minus')]")
     private WebElement decrementQuantityButton;
-
-    @FindBy(id = "show-your-cart")
-    private WebElement cartIcon;
     
     @FindBy(xpath = "//button[@data-type='minus']/following-sibling::input[contains(@class, 'input-number')]")
     private WebElement quantityInput;
@@ -142,7 +140,7 @@ public class ProductPage extends BasePage {
      */
     public CartPage goToCart() {
         logger.info("Navigating to cart page");
-        clickElement(cartIcon);
+        pageLayout.clickCartIcon();
         waitForPageLoad();
         wait.until(ExpectedConditions.presenceOfElementLocated(
                 By.xpath("//div[contains(@class,'shopping-summery') or contains(@class,'shopping-cart')]")));

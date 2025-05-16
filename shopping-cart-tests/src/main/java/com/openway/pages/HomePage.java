@@ -9,15 +9,13 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  * Page object for the Home page of Periplus website
  */
 public class HomePage extends BasePage {
+    private PageLayout pageLayout = new PageLayout(driver);
 
     @FindBy(id = "filter_name")
     private WebElement searchBox;
     
     @FindBy(css = ".search-bar button[type='submit']")
     private WebElement searchButton;
-    
-    @FindBy(id = "show-your-cart")
-    private WebElement cartIcon;
     
     /**
      * Constructor
@@ -64,7 +62,7 @@ public class HomePage extends BasePage {
      */
     public CartPage goToCart() {
         logger.info("Navigating to cart page");
-        clickElement(cartIcon);
+        pageLayout.clickCartIcon();
         waitForPageLoad();
         return new CartPage(driver);
     }
@@ -78,5 +76,13 @@ public class HomePage extends BasePage {
         logger.info("Navigating to login page");
         driver.get("https://www.periplus.com/account/Login");
         return new LoginPage(driver);
+    }
+
+    /**
+     * Logs out of the website
+     */
+    public void logout(){
+        driver.get("https://www.periplus.com/_index_/Logout");
+        waitForPageLoad();
     }
 }
