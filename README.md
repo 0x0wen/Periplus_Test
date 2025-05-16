@@ -5,6 +5,9 @@
     mvn clean test
 ```
 
+## Test Script Execution
+[Test Recording](https://youtu.be/22UbLX-4J9g)
+
 ## Test Case Description
 
 | ID         | Name                              | Objective                                            | Preconditions                                                   | Data                                                                 | Steps                                                                                                                                                                                                                                                                      | Expected Result                                             |
