@@ -61,9 +61,9 @@ public class ShoppingCartTest extends BaseTest {
     @DataProvider(name = "cartTestData")
     public Object[][] getCartTestData() {
         return new Object[][] {
-            {"Blockchain", 0, 1, true},
-            {"Java Programming", 0, 3, true},
-            {"Design Patterns", 1, 2, true} 
+            {"Blockchain", 0, 1, true},         // Choosing the first product with the quantity of 1
+            {"Java Programming", 0, 3, true},   // Choosing the first product with the quantity of 3
+            {"Design Patterns", 1, 2, true}     // Choosing the second product with the quantity of 2
         };
     }
     
@@ -84,7 +84,6 @@ public class ShoppingCartTest extends BaseTest {
             String productId = driver.getCurrentUrl().replaceAll(".*/p/([0-9]+).*", "$1");
             double productPrice = productPage.getProductPrice();
             
-            // Only set quantity if it's not already 1
             if (quantity > 1) {
                 productPage.setQuantity(quantity);
             }
@@ -156,7 +155,6 @@ public class ShoppingCartTest extends BaseTest {
                 }
                 productPage.addToCart();
                 
-                // Go back to home page for next search instead of going to cart
                 homePage.navigateTo(BASE_URL);
             }
             
@@ -211,7 +209,6 @@ public class ShoppingCartTest extends BaseTest {
             Assert.assertTrue(cartPage.hasItems(), "Cart should not be empty");
             Assert.assertTrue(cartPage.containsProduct(productId), "Cart should contain the added product");
             
-            // Record the total number of products before removal
             int initialProductCount = cartPage.getNumberOfProducts();
             
             cartPage.removeProduct(productId);
@@ -219,7 +216,6 @@ public class ShoppingCartTest extends BaseTest {
             Assert.assertFalse(cartPage.containsProduct(productId), 
                               "Product should be removed from cart: " + productId);
             
-            // Check if this was the only product or if there are still other products
             int expectedRemainingProducts = initialProductCount - 1;
             Assert.assertEquals(cartPage.getNumberOfProducts(), expectedRemainingProducts, 
                                 "Number of products should decrease by 1");
@@ -228,6 +224,146 @@ public class ShoppingCartTest extends BaseTest {
                 Assert.assertTrue(cartPage.isEmpty(), "Cart should be empty after removing all products");
                 Assert.assertTrue(cartPage.isEmptyMessageDisplayed(), "Empty cart message should be displayed");
             }
+            
+            logger.info("Test completed successfully");
+        } catch (Exception e) {
+            logger.severe("Test failed with exception: " + e.getMessage());
+            throw e;  
+        }
+    }
+
+    /**
+     * Test increasing the quantity of a product in the cart and verifying related fields changes
+     */
+    @Test(description = "Increase product quantity in cart and verify field updates")
+    public void testIncreaseQuantityInCart() {
+        logger.info("Starting test: Increase product quantity in cart");
+        
+        try {
+            ProductsPage productsPage = homePage.searchForProduct(SEARCH_TERM);
+            ProductPage productPage = productsPage.selectFirstProduct();
+            
+            String productId = driver.getCurrentUrl().replaceAll(".*/p/([0-9]+).*", "$1");
+            double productPrice = productPage.getProductPrice();
+            
+            productPage.addToCart();
+            
+            CartPage cartPage = productPage.goToCart();
+            
+            Assert.assertTrue(cartPage.hasItems(), "Cart should not be empty");
+            Assert.assertEquals(cartPage.getProductQuantity(productId), 1, "Initial quantity should be 1");
+            double initialTotal = cartPage.getCartTotal();
+            
+            int initialQuantity = cartPage.getProductQuantity(productId);
+            
+            int quantityIncrease = 2;
+            int newQuantity = initialQuantity + quantityIncrease;
+            cartPage.updateProductQuantity(productId, newQuantity);
+
+            cartPage.updateCartPage();
+            
+
+            Assert.assertEquals(cartPage.getProductQuantity(productId), newQuantity, 
+                               "Quantity should be increased to " + newQuantity);
+            
+            double expectedNewSubtotal = productPrice * newQuantity;
+            Assert.assertEquals(cartPage.getProductSubtotal(productId), expectedNewSubtotal, 0.01, 
+                               "Subtotal should reflect the increased quantity");
+            
+            double expectedTotalIncrease = productPrice * quantityIncrease;
+            double expectedNewTotal = initialTotal + expectedTotalIncrease;
+            Assert.assertEquals(cartPage.getCartTotal(), expectedNewTotal, 0.01, 
+                               "Cart total should reflect the increased product quantity");
+            
+            logger.info("Test completed successfully");
+        } catch (Exception e) {
+            logger.severe("Test failed with exception: " + e.getMessage());
+            throw e;  
+        }
+    }
+
+    /**
+     * Test decreasing the quantity of a product in the cart and verifying related fields changes
+     */
+    @Test(description = "Decrease product quantity in cart and verify field updates")
+    public void testDecreaseQuantityInCart() {
+        logger.info("Starting test: Decrease product quantity in cart");
+        
+        try {
+            ProductsPage productsPage = homePage.searchForProduct(SEARCH_TERM);
+            ProductPage productPage = productsPage.selectFirstProduct();
+            
+            String productId = driver.getCurrentUrl().replaceAll(".*/p/([0-9]+).*", "$1");
+            double productPrice = productPage.getProductPrice();
+            
+            productPage.setQuantity(3);
+            productPage.addToCart();
+            
+            CartPage cartPage = productPage.goToCart();
+            
+            Assert.assertTrue(cartPage.hasItems(), "Cart should not be empty");
+            Assert.assertEquals(cartPage.getProductQuantity(productId), 3, "Initial quantity should be 3");
+            
+            int initialQuantity = cartPage.getProductQuantity(productId);
+            double initialTotal = cartPage.getCartTotal();
+            
+            int quantityDecrease = 1;
+            int newQuantity = initialQuantity - quantityDecrease;
+            cartPage.updateProductQuantity(productId, newQuantity);
+            
+            cartPage.updateCartPage();
+            
+            Assert.assertEquals(cartPage.getProductQuantity(productId), newQuantity, 
+                               "Quantity should be decreased to " + newQuantity);
+            
+            double expectedNewSubtotal = productPrice * newQuantity;
+            Assert.assertEquals(cartPage.getProductSubtotal(productId), expectedNewSubtotal, 0.01, 
+                               "Subtotal should reflect the decreased quantity");
+            
+            double expectedTotalDecrease = productPrice * quantityDecrease;
+            double expectedNewTotal = initialTotal - expectedTotalDecrease;
+            Assert.assertEquals(cartPage.getCartTotal(), expectedNewTotal, 0.01, 
+                               "Cart total should reflect the decreased product quantity");
+            
+            logger.info("Test completed successfully");
+        } catch (Exception e) {
+            logger.severe("Test failed with exception: " + e.getMessage());
+            throw e;  
+        }
+    }
+    
+    /**
+     * Test cart persistence between sessions
+     */
+    @Test(description = "Verify cart persists between sessions")
+    public void testCartPersistence() {
+        logger.info("Starting test: Cart persistence between sessions");
+        
+        try {
+            ProductsPage productsPage = homePage.searchForProduct(SEARCH_TERM);
+            ProductPage productPage = productsPage.selectFirstProduct();
+            
+            String productId = driver.getCurrentUrl().replaceAll(".*/p/([0-9]+).*", "$1");
+            productPage.addToCart();
+            
+            CartPage cartPage = productPage.goToCart();
+            Assert.assertTrue(cartPage.containsProduct(productId), "Cart should contain the added product");
+            
+            int quantity = cartPage.getProductQuantity(productId);
+            double subtotal = cartPage.getProductSubtotal(productId);
+            
+            homePage.logout();
+            homePage.goToLoginPage()
+                   .login(TEST_EMAIL, TEST_PASSWORD);
+            
+            cartPage = homePage.goToCart();
+            
+            Assert.assertTrue(cartPage.containsProduct(productId), 
+                             "Cart should still contain the product after session restart");
+            Assert.assertEquals(cartPage.getProductQuantity(productId), quantity, 
+                               "Product quantity should persist between sessions");
+            Assert.assertEquals(cartPage.getProductSubtotal(productId), subtotal, 0.01, 
+                               "Product subtotal should persist between sessions");
             
             logger.info("Test completed successfully");
         } catch (Exception e) {
