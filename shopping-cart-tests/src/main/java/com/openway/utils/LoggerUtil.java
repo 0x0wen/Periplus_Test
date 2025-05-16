@@ -78,7 +78,6 @@ public class LoggerUtil {
             System.out.println("Could not load log level from properties, using default: " + logLevelStr);
         }
         
-        // Convert string to Level
         try {
             return Level.parse(logLevelStr);
         } catch (IllegalArgumentException e) {

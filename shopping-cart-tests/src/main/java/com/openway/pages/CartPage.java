@@ -139,7 +139,6 @@ public class CartPage extends BasePage {
         for (WebElement productElement : productElements) {
             String productId = productElement.getText().replaceAll("\\s+", " ").trim();
             if (productId.matches(".*\\d{13}.*")) {
-                // Extract the 13-digit ISBN/product ID
                 productId = productId.replaceAll(".*?(\\d{13}).*", "$1").trim();
                 productIds.add(productId);
             }
@@ -203,7 +202,6 @@ public class CartPage extends BasePage {
         WebElement quantityElement;
         try {
             quantityElement = productRow.findElement(By.xpath(".//div[contains(@class,'row qty')]//input"));
-            logger.info("ABUNGDA" + Integer.parseInt(quantityElement.getDomAttribute("value")));
             return Integer.parseInt(quantityElement.getDomAttribute("value"));
         } catch (NoSuchElementException e) {
             try {
@@ -232,18 +230,15 @@ public class CartPage extends BasePage {
             return 0.0;
         }
         
-        // Extract the price from the row
         WebElement priceElement = productRow.findElement(By.xpath(".//div[@class='row' and contains(text(), 'Rp')]"));
         String priceText = priceElement.getText().trim().split("or")[0].trim();
         priceText = priceText.replaceAll("[^0-9.,]", "").replace(",", "");
         double price = Double.parseDouble(priceText);
         
-        // Extract the quantity from the input field
         WebElement quantityElement = productRow.findElement(By.xpath(".//div[contains(@class,'row qty')]//input"));
         String quantityText = quantityElement.getDomAttribute("value");
         int quantity = Integer.parseInt(quantityText);
         
-        // Calculate subtotal by multiplying price and quantity
         double subtotal = price * quantity;
         
         logger.info("Calculated subtotal for product ID " + productId + ": " + subtotal);
@@ -268,33 +263,25 @@ public class CartPage extends BasePage {
         }
         
         try {
-            // Find the quantity input to get current quantity
             WebElement quantityInput = productRow.findElement(By.xpath(".//div[contains(@class,'row qty')]//input"));
             int currentQuantity = Integer.parseInt(quantityInput.getDomAttribute("value"));
             
-            // Find plus and minus buttons
             WebElement minusButton = productRow.findElement(By.xpath(".//button[@data-type='minus' and contains(@name, 'minus')]"));
             WebElement plusButton = productRow.findElement(By.xpath(".//button[@data-type='plus' and contains(@name, 'plus')]"));
             
-            // Calculate how many times to click plus or minus
             if (newQuantity > currentQuantity) {
-                // Need to increase quantity
                 int clickCount = newQuantity - currentQuantity;
                 for (int i = 0; i < clickCount; i++) {
                     clickElement(plusButton);
-                    // Small wait to allow for any JavaScript to execute
                     wait.until(ExpectedConditions.attributeToBe(quantityInput, "value", String.valueOf(currentQuantity + i + 1)));
                 }
             } else if (newQuantity < currentQuantity) {
-                // Need to decrease quantity
                 int clickCount = currentQuantity - newQuantity;
                 for (int i = 0; i < clickCount; i++) {
                     clickElement(minusButton);
-                    // Small wait to allow for any JavaScript to execute
                     wait.until(ExpectedConditions.attributeToBe(quantityInput, "value", String.valueOf(currentQuantity - i - 1)));
                 }
             } else {
-                // Quantity is already correct
                 logger.info("Quantity is already set to " + newQuantity + ". No action needed.");
                 return this;
             }
@@ -305,7 +292,6 @@ public class CartPage extends BasePage {
         }
         
         waitForPageLoad();
-        // Wait for any potential cart update indicators to disappear
         try {
             wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[contains(@class,'updating-cart')]")));
         } catch (Exception e) {
@@ -351,7 +337,6 @@ public class CartPage extends BasePage {
     public CartPage clearCart() {
         logger.info("Clearing all products from cart");
         
-        // Get all product IDs currently in the cart
         List<String> productIds = getProductIds();
         
         if (productIds.isEmpty()) {
@@ -359,16 +344,13 @@ public class CartPage extends BasePage {
             return this;
         }
         
-        // Log the number of products to be removed
         logger.info("Found " + productIds.size() + " products to remove from cart");
         
-        // Remove each product one by one
         for (String productId : productIds) {
             try {
                 logger.info("Removing product with ID: " + productId);
                 removeProduct(productId);
                 
-                // Wait briefly to allow for any JavaScript updates
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -377,11 +359,9 @@ public class CartPage extends BasePage {
                 }
             } catch (NoSuchElementException e) {
                 logger.warning("Failed to remove product with ID: " + productId + ". Error: " + e.getMessage());
-                // Continue with next product even if one fails
             }
         }
         
-        // Verify cart is now empty
         waitForPageLoad();
         if (isEmpty()) {
             logger.info("Cart successfully cleared");
