@@ -2,29 +2,27 @@
 
 ## How to run?
 ```bash
-    mvn clean test -Dtest.email=your@email.com -Dtest.password=your_password
+    mvn clean test
 ```
 
-## TC-CART-001: Add a product to the cart
+## Test Case Description
 
-**Objective:**  
-Ensure product addition works correctly
+| ID         | Name                              | Objective                                            | Preconditions                                                   | Data                                                                 | Steps                                                                                                                                                                                                                                                                      | Expected Result                                             |
+|------------|-----------------------------------|------------------------------------------------------|------------------------------------------------------------------|----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+| TC-SC-001  | Add a product to the cart         | Ensure product addition works correctly              | User is registered, stable internet, and cart is empty           | Product in “Blockchains”                                             | 1. Open browser<br>2. Go to https://www.periplus.com/<br>3. Login<br>4. Search "Blockchains"<br>5. Add first product to cart<br>6. Verify the product is in the cart                                                                                                      | The cart has a product from “Blockchains”                   |
+| TC-SC-002  | Add multiple products to cart     | Verify multiple products can be added in one session | User is logged in, cart is empty                                 | "Java Programming", "Python", "Data Science"                         | 1. For each term, search and add specific quantity<br>2. Return to homepage<br>3. Open cart<br>4. Check each product, its quantity, subtotal, and total                                                                                                                    | All added products are present with correct quantities      |
+| TC-SC-003  | Remove product from cart          | Ensure removing a product works correctly            | Cart contains a product                                          | Product in “Blockchains”                                             | 1. Search and add a product<br>2. Go to cart<br>3. Remove the product<br>4. Verify it's removed and count is updated                                                                                                               | Product is removed; cart is empty or count is reduced      |
+| TC-SC-004  | Increase quantity in cart         | Verify quantity increase updates totals              | Cart contains a product with quantity 1                          | Product in “Blockchains”                                             | 1. Add a product<br>2. Go to cart<br>3. Increase quantity<br>4. Update cart<br>5. Verify quantity, subtotal, and total                                                                                                             | Quantities and totals are updated correctly                |
+| TC-SC-005  | Decrease quantity in cart         | Verify quantity decrease updates totals              | Cart contains a product with quantity 3                          | Product in “Blockchains”                                             | 1. Add a product with quantity 3<br>2. Go to cart<br>3. Decrease quantity<br>4. Update cart<br>5. Verify quantity, subtotal, and total                                                                                              | Quantities and totals are updated correctly                |
+| TC-SC-006  | Cart persistence between sessions | Ensure cart content persists after logout/login      | User is logged in, product added to cart                         | Product in “Blockchains”                                             | 1. Add a product<br>2. Logout<br>3. Login again<br>4. Go to cart<br>5. Verify product, quantity, and subtotal remain                                                                                                               | Cart contents persist after session change                 |
 
-**Preconditions:**  
-- The user is registered and logged in  
-- Has an internet connection  
-- Cart is empty
+## Test Result
 
-**Data:**  
-- Product in "Blockchains"
-
-**Test Steps:**
-1. Opens Google Chrome in a new window  
-2. Navigates to https://www.periplus.com/  
-3. Enters a login and password  
-4. Finds one product in "Blockchains"  
-5. Adds the first product to the cart  
-6. Verifies that the product has been successfully added to the cart
-
-**Expected Result:**  
-- The cart has a product from “Blockchains”
+| ID         | Name                              | Expected Result                                      | Actual Result                                        | Status | Comments                                   |
+|------------|-----------------------------------|------------------------------------------------------|------------------------------------------------------|--------|--------------------------------------------|
+| TC-SC-001  | Add a product to the cart         | The cart has a product from “Blockchains”            | The cart has a product from “Blockchains”            | Pass   | Product addition to the cart works correctly |
+| TC-SC-002  | Add multiple products to cart     | All added products are present with correct quantities| All added products are present with correct quantities| Pass   | Multiple product addition works as expected  |
+| TC-SC-003  | Remove product from cart          | Product is removed; cart is empty or count is reduced| Product is removed successfully                      | Pass   | Product removal works correctly              |
+| TC-SC-004  | Increase quantity in cart         | Quantities and totals are updated correctly          | Quantities and totals are updated correctly          | Pass   | Quantity increase reflects in subtotal/total |
+| TC-SC-005  | Decrease quantity in cart         | Quantities and totals are updated correctly          | Quantities and totals are updated correctly          | Pass   | Quantity decrease reflects in subtotal/total |
+| TC-SC-006  | Cart persistence between sessions | Cart contents persist after session change           | Cart contents persist after session change           | Pass   | Cart data persisted successfully             |
